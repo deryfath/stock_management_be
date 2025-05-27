@@ -29,6 +29,11 @@ const Order = sequelize.define('order', {
         type: DataTypes.INTEGER,
         allowNull: false
       },
+      status: {
+        type: DataTypes.ENUM('paid', 'unpaid', 'cancelled'),
+        allowNull: true,
+        defaultValue: 'unpaid'
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

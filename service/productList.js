@@ -1,5 +1,6 @@
 
 const Product = require('../repository/product')
+const Warehouse = require('../repository/warehouse');
 const Models = require('../config/database');
 const { Op, where } = require('sequelize');
 
@@ -101,14 +102,28 @@ exports.expired = async () => {
 };
 
 exports.add = async (body) => {
-    if(body.name && body.price && body.stock){
+    if(body.name && body.price && body.stock && body.expiredAt && body.warehouseId){
         const productData = {
                 name: body.name,
                 price: body.price,
                 stock: body.stock,
+                warehouseId: body.warehouseId,
                 expiredAt: new Date(body.expiredAt)
             };  
-                
+
+        //check if warehouseId exist
+        const existingWarehouse = await Warehouse.findOne({
+            id: body.warehouseId    
+        });
+
+        if(existingWarehouse == null){
+            return {
+                success: false,
+                code: 404,
+                message: `warehouse with id ${body.warehouseId} not found`
+            }
+        }
+               
         const createdProduct = await Product.create(productData);
         return {
             success: true,
