@@ -2,27 +2,19 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Checkout = sequelize.define('checkout', {
+const Shop = sequelize.define('shop', {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
         primaryKey: true,
         allowNull: false,
         autoIncrement: true
       },
-      productId: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
-      productName: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: true
-      },
-      userId: {
-        type: DataTypes.INTEGER,
+      address: {
+        type: DataTypes.STRING,
         allowNull: false
       },
       createdAt: {
@@ -41,9 +33,9 @@ const Checkout = sequelize.define('checkout', {
         paranoid: true,
         underscored: true,
         freezeTableName: true,
-        tableName: 'checkout'
+        tableName: 'shop'
       }
     );
   
-module.exports = { Checkout };
+module.exports = { Shop };
   

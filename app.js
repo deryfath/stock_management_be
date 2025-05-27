@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const sequelize = require('./config/database');
+const db = require('./model');
 const routes = require('./router/index');
 require('dotenv').config();
 
@@ -10,10 +10,10 @@ app.use(cors());
 app.use(express.json());
 app.use('/', routes);
 
-sequelize.authenticate()
+db.sequelize.authenticate()
   .then(() => {
     console.log('Connection to MySQL has been established successfully.');
-    return sequelize.sync();  
+    return db.sequelize.sync();  
   })
   .then(() => {
     console.log('Database synchronized.');

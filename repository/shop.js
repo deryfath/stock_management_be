@@ -1,28 +1,28 @@
-const { Order } = require('../model/order');
+const { Shop } = require('../model/shop');
 
 exports.findOne = (where, opt = {}) => {
-    return Order.findOne({
+    return Shop.findOne({
       where,
       ...opt
     });
   };
 
 exports.findAll = (where, opt = {}) => {
-    return Order.findAll({
+    return Shop.findAll({
       where,
       ...opt
     });
   };
 
 exports.delete = (where, opt) => {
-    return Order.destroy({
+    return Shop.destroy({
       where,
       ...opt
     });
   };
 
 exports.update = async (data, where, trx) => {
-    return Order.update(data, {
+    return Shop.update(data, {
         where,
         transaction: trx
       });

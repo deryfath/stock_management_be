@@ -21,6 +21,10 @@ const Product = sequelize.define('product', {
         type: DataTypes.BIGINT,
         allowNull: false
       },
+      warehouseId: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: true
+      },
       expiredAt: {
         type: DataTypes.DATE,
         allowNull: false,

@@ -1,39 +1,21 @@
 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const { Order } = require('./order');
 
-const User = sequelize.define('user', {
+const ShopWarehouse = sequelize.define('shopWarehouse', {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
         primaryKey: true,
         allowNull: false,
         autoIncrement: true
       },
-      name: {
-        type: DataTypes.STRING,
+      shopId: {
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false
       },
-      address: {
-        type: DataTypes.STRING,
+      warehouseId: {
+        type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      role: {
-        type: DataTypes.ENUM('admin', 'user'),
-        allowNull: true,
-      },
-      isLogin: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -51,9 +33,9 @@ const User = sequelize.define('user', {
         paranoid: true,
         underscored: true,
         freezeTableName: true,
-        tableName: 'user'
+        tableName: 'shop_warehouse'
       }
     );
   
-module.exports = { User };
+module.exports = { ShopWarehouse };
   
