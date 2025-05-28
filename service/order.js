@@ -1,13 +1,13 @@
 
 const User = require('../repository/user')
 const Product = require('../repository/product')
-const Checkout = require('../repository/checkout')
+const Order = require('../repository/order')
 const Models = require('../config/database')
 
 exports.checkoutList = async (query) => {
 
     if(query){
-        const checkoutList = await Checkout.findAll({
+        const checkoutList = await Order.findAll({
             userId: query.userId
         })
 
@@ -47,44 +47,48 @@ exports.checkoutList = async (query) => {
 exports.add = async (body) => {
     const trx = await Models.transaction();
 
-    if(body.productId && body.qty && body.userId){
-
-        const existingProduct = await Product.findOne({
-            id : body.productId
-        });
-
-        if(existingProduct){
-            const checkoutData = {
-                productId : existingProduct.id,
-                productName : existingProduct.name,
-                quantity : body.qty,
-                userId : body.userId
-            }
-             
-            const checkoutExisting = await Checkout.findOne({
-                productId : existingProduct.id
-            })
-            if(checkoutExisting){
-                await Checkout.update({
-                    quantity : checkoutExisting.quantity + body.qty
-                },{
-                    productId: body.productId,
+    if(body.product && body.product.length > 0 && body.userId && body.shopId){
+       body.product.forEach(async (product, index) => {
+            const existingProduct = await Product.findOne({
+                id : product.id,   
+                deletedAt: null
+            });
+            if(existingProduct){
+                const checkoutData = {
+                    productId : existingProduct.id,
+                    productName : existingProduct.name,
+                    quantity : product.qty,
+                    userId : body.userId,
+                    shopId : body.shopId,
+                }
+                
+                const checkoutExisting = await Order.findOne({
+                    productId : existingProduct.id,
                     userId: body.userId
-                }, trx);
-            }else{
-                await Checkout.create(checkoutData)
-            }
-        }else{
-            await trx.rollback()
-            return {
-                success: false,
-                code: 403,
-                message: "there is invalid product",
-            } 
-        }
-        
-        await trx.commit()
+                })
+                if(checkoutExisting){
+                    await Order.update({
+                        quantity : checkoutExisting.quantity + product.qty
+                    },{
+                        productId: existingProduct.id,
+                        userId: body.userId
+                    });
+                }else{
+                    await Order.create(checkoutData, trx)
+                }
 
+            }else{
+                await trx.rollback()
+                return {
+                    success: false,
+                    code: 403,
+                    message: "there is invalid product",
+                } 
+            }
+         
+        })
+
+        await trx.commit()
         return {
             success: true,
             code: 200,
@@ -106,7 +110,7 @@ exports.submit = async (body) => {
     const trx = await Models.transaction();
 
     if(body.userId){
-        const checkoutList = await Checkout.findAll({
+        const checkoutList = await Order.findAll({
             userId : body.userId
         })
 
@@ -134,9 +138,12 @@ exports.submit = async (body) => {
             }
         }
 
-        await Checkout.delete({
-            userId : body.userId
-        })
+        await Order.update({
+            status: "paid"
+        },
+        {
+            id: body.userId
+        }, trx);
 
         await trx.commit()
 

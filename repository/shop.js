@@ -29,7 +29,7 @@ exports.update = async (data, where, trx) => {
   };
 
   exports.create = async (data, options) => {
-    return Order.create(data, options);
+    return Shop.create(data, options);
   };
 
 module.exports = exports;

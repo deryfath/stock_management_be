@@ -1,4 +1,4 @@
-const { checkoutList, submit, add } = require('../service/checkout');
+const { checkoutList, submit, add } = require('../service/order');
 
 exports.list = async (req, res) => {
   const { query } = req;

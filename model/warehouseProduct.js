@@ -2,20 +2,20 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const ShopWarehouse = sequelize.define('shopWarehouse', {
+const WarehouseProduct = sequelize.define('warehouseProduct', {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
         primaryKey: true,
         allowNull: false,
         autoIncrement: true
       },
-      shopId: {
+      productId: {
         type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: false
+        allowNull: true
       },
       warehouseId: {
         type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: false
+        allowNull: true
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -33,9 +33,9 @@ const ShopWarehouse = sequelize.define('shopWarehouse', {
         paranoid: true,
         underscored: true,
         freezeTableName: true,
-        tableName: 'shop_warehouse'
+        tableName: 'warehouse_product'
       }
     );
   
-module.exports = { ShopWarehouse };
+module.exports = { WarehouseProduct };
   

@@ -3,6 +3,7 @@ const Product = require('../repository/product')
 const Warehouse = require('../repository/warehouse');
 const Models = require('../config/database');
 const { Op, where } = require('sequelize');
+const { WarehouseProduct } = require('../model/warehouseProduct');
 
 exports.productList = async (req) => {
     const limit = parseInt(req.query.limit);
@@ -17,17 +18,48 @@ exports.productList = async (req) => {
       };
     const order = [['updatedAt', 'DESC']];
 
+    
     const { rows: data, count: total } = await Product.findAndCountAll(where, {
         limit,
         offset,
         order
       });
     
+    //insert warehouse data in data
+    const mapData = await Promise.all(data.map(async (item) => {
+        const warehouseProduct = await WarehouseProduct.findAll({
+            where: {
+                productId: item.id
+            }
+        });
+        if(warehouseProduct.length > 0){
+            const warehouse = await Promise.all(warehouseProduct.map(async (warehouseProduct) => {
+                const warehouse = await Warehouse.findOne({
+                    id: warehouseProduct.warehouseId
+                });
+                return {
+                    warehouseName: warehouse ? warehouse.name : null,
+                    warehouseId: warehouse ? warehouse.id : null
+                };
+            }));
+           
+            return {
+                ...item.dataValues,
+                warehouse
+            };
+        } else {
+            return {
+                ...item.dataValues,
+                warehouse : null
+            };
+        }
+    }));
+
     return {
         success : true,
         message: "Success Retrieve product list",
         data: {
-            data,
+            mapData,
             total,
         },
     }
@@ -107,24 +139,31 @@ exports.add = async (body) => {
                 name: body.name,
                 price: body.price,
                 stock: body.stock,
-                warehouseId: body.warehouseId,
-                expiredAt: new Date(body.expiredAt)
+                expiredAt: new Date(body.expiredAt),
+                warehouseId: body.warehouseId
             };  
 
-        //check if warehouseId exist
         const existingWarehouse = await Warehouse.findOne({
-            id: body.warehouseId    
+            id: body.warehouseId,
+            deletedAt: null    
         });
-
-        if(existingWarehouse == null){
+        if(!existingWarehouse){
             return {
                 success: false,
                 code: 404,
-                message: `warehouse with id ${body.warehouseId} not found`
+                message: "warehouse not found"
             }
         }
-               
+
         const createdProduct = await Product.create(productData);
+
+        const warehouseProductData = {
+            warehouseId: body.warehouseId,
+            productId: createdProduct.id
+        }
+
+        await WarehouseProduct.create(warehouseProductData);
+
         return {
             success: true,
             code: 200,
@@ -156,7 +195,8 @@ exports.update = async (body) => {
                       name : body.name,
                       stock: body.stock,
                       price: body.price,
-                      expiredAt: body.expiredAt
+                      expiredAt: body.expiredAt,
+                      warehouseId: body.warehouseId
                   },{
                       id: body.id
                   }, trx);

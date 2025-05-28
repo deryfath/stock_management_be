@@ -17,6 +17,10 @@ const Warehouse = sequelize.define('warehouse', {
         type: DataTypes.STRING,
         allowNull: false
       },
+      shopId: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: true
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
